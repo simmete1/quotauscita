@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scarica Progetto - Ma quanto ci costa?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #482878 0%, #8b6f47 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #482878;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #8b6f47;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .button {
+            background: #482878;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .button:hover {
+            background: #5a3694;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(72, 40, 120, 0.3);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .info {
+            background: #f5f1e8;
+            border: 2px solid #8b6f47;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .info h3 {
+            color: #482878;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .info ol {
+            color: #8b6f47;
+            padding-left: 20px;
+        }
+        
+        .info li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .success {
+            background: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎒 Ma quanto ci costa?</h1>
+        <p class="subtitle">Scarica il progetto completo</p>
+        
+        <button class="button" onclick="downloadProject()" id="downloadBtn">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+            </svg>
+            Scarica ZIP
+        </button>
+        
+        <div class="success" id="successMsg">
+            ✅ Download completato! Estrai il file ZIP e caricalo su GitHub.
+        </div>
+        
+        <div class="info">
+            <h3>📝 Cosa fare dopo:</h3>
+            <ol>
+                <li>Clicca sul pulsante per scaricare il file <strong>quotauscita.zip</strong></li>
+                <li>Estrai il file ZIP sul tuo Mac (doppio click)</li>
+                <li>Vai su <a href="https://github.com/simmete1/quotauscita" target="_blank" style="color: #482878; font-weight: 600;">github.com/simmete1/quotauscita</a></li>
+                <li>Clicca su "uploading an existing file"</li>
+                <li>Trascina TUTTI i file e cartelle dalla cartella estratta</li>
+                <li>Clicca "Commit changes"</li>
+                <li>Abilita GitHub Pages nelle impostazioni</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        async function downloadProject() {
+            const btn = document.getElementById('downloadBtn');
+            const successMsg = document.getElementById('successMsg');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading"></div> Creazione ZIP...';
+            successMsg.style.display = 'none';
+            
+            try {
+                const zip = new JSZip();
+                
+                // Struttura del progetto con tutti i file
+                const files = {
+                    'package.json': `{
+  "name": "quotauscita",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "0.487.0",
+    "motion": "12.23.24",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.12",
+    "@vitejs/plugin-react": "4.7.0",
+    "tailwindcss": "4.1.12",
+    "typescript": "5.7.3",
+    "vite": "6.3.5"
+  }
+}`,
+                    
+                    'vite.config.ts': `import { defineConfig } from 'vite'
+import path from 'path'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  base: '/quotauscita/',
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  assetsInclude: ['**/*.svg', '**/*.csv'],
+})`,
+                    
+                    'postcss.config.mjs': `export default {
+  plugins: {
+    tailwindcss: {},
+  },
+}`,
+                    
+                    'index.html': `<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ma quanto ci costa? - Calcola quote uscita scout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>`,
+                    
+                    'src/main.tsx': `import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './styles/index.css'
+import App from './app/App'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)`,
+                    
+                    'src/app/App.tsx': `import { useState } from 'react';
+import { Backpack, Compass, Tent, TrendingUp, TrendingDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+interface BudgetData {
+  bambiniTotali: number;
+  bambiniPernotto: number;
+  trasportoBambino: number;
+  trasportoCapi: number;
+  numeroCapi: number;
+  offertaSede: number;
+  spesaCibo: number;
+  materialiAttivita: number;
+  quotaGiorno: number;
+  quotaPernotto: number;
+  quotaCapiDiCassa: boolean;
+  importoCapiDiCassa: number;
+}
+
+export default function App() {
+  const [data, setData] = useState<BudgetData>({
+    bambiniTotali: 0,
+    bambiniPernotto: 0,
+    trasportoBambino: 0,
+    trasportoCapi: 0,
+    numeroCapi: 0,
+    offertaSede: 0,
+    spesaCibo: 0,
+    materialiAttivita: 0,
+    quotaGiorno: 0,
+    quotaPernotto: 0,
+    quotaCapiDiCassa: false,
+    importoCapiDiCassa: 0,
+  });
+
+  const updateField = (field: keyof BudgetData, value: number | boolean) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Calcoli
+  const bambiniGiorno = data.bambiniTotali - data.bambiniPernotto;
+  
+  const usciteTotali =
+    data.trasportoBambino * data.bambiniTotali +
+    data.trasportoCapi * data.numeroCapi +
+    data.offertaSede +
+    data.spesaCibo +
+    data.materialiAttivita;
+
+  const entrateBambini =
+    data.quotaGiorno * bambiniGiorno + data.quotaPernotto * data.bambiniPernotto;
+  
+  const entrateCapi = data.quotaCapiDiCassa 
+    ? data.importoCapiDiCassa * data.numeroCapi 
+    : 0;
+  
+  const entrateTotali = entrateBambini + entrateCapi;
+  const bilancio = entrateTotali - usciteTotali;
+  
+  const usciteDaCopriereConBambini = data.quotaCapiDiCassa 
+    ? usciteTotali - entrateCapi 
+    : usciteTotali;
+  
+  const quotaMedia = data.bambiniTotali > 0 ? usciteDaCopriereConBambini / data.bambiniTotali : 0;
+
+  const impostaQuotePareggio = () => {
+    setData((prev) => ({
+      ...prev,
+      quotaGiorno: Math.ceil(quotaMedia * 100) / 100,
+      quotaPernotto: Math.ceil(quotaMedia * 1.2 * 100) / 100,
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f5f1e8] p-6 md:p-8" style={{ fontFamily: 'Prompt, sans-serif' }}>
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Backpack className="w-8 h-8 text-[#482878]" />
+            <h1 className="text-4xl font-bold text-[#482878] text-center" style={{ fontFamily: 'Prompt, sans-serif', fontWeight: 900 }}>
+              Ma quanto ci costa?
+            </h1>
+            <Compass className="w-8 h-8 text-[#482878]" />
+            <Tent className="w-7 h-7 text-[#482878]" />
+          </div>
+          <p className="text-center text-[#8b6f47] text-lg">
+            Calcola le quote per la tua uscita scout
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md border-2 border-[#8b6f47] p-6">
+              <h2 className="text-2xl font-normal text-[#482878] mb-4 border-b-2 border-[#482878] pb-2">
+                👥 Partecipanti
+              </h2>
+              <div className="space-y-4">
+                <InputField
+                  label="Bambini totali"
+                  value={data.bambiniTotali}
+                  onChange={(v) => updateField('bambiniTotali', v)}
+                />
+                <InputField
+                  label="Bambini con pernotto"
+                  value={data.bambiniPernotto}
+                  onChange={(v) => updateField('bambiniPernotto', v)}
+                />
+                <div className="text-sm text-[#8b6f47] mt-2 bg-[#f5f1e8] p-2 rounded">
+                  Bambini solo giorno: <strong>{bambiniGiorno}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md border-2 border-[#8b6f47] p-6">
+              <h2 className="text-2xl font-normal text-[#482878] mb-4 border-b-2 border-[#482878] pb-2">
+                🎒 Extra
+              </h2>
+              <div className="space-y-4">
+                <InputField
+                  label="Spesa cibo (€)"
+                  value={data.spesaCibo}
+                  onChange={(v) => updateField('spesaCibo', v)}
+                  step={0.1}
+                />
+                <InputField
+                  label="Materiali o attività (€)"
+                  value={data.materialiAttivita}
+                  onChange={(v) => updateField('materialiAttivita', v)}
+                  step={0.1}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md border-2 border-[#8b6f47] p-6">
+              <h2 className="text-2xl font-normal text-[#482878] mb-4 border-b-2 border-[#482878] pb-2">
+                🚂 Trasporti e Sede
+              </h2>
+              <div className="space-y-4">
+                <InputField
+                  label="Trasporto bambino (€)"
+                  value={data.trasportoBambino}
+                  onChange={(v) => updateField('trasportoBambino', v)}
+                  step={0.1}
+                />
+                <InputField
+                  label="Trasporto capi (€)"
+                  value={data.trasportoCapi}
+                  onChange={(v) => updateField('trasportoCapi', v)}
+                  step={0.1}
+                />
+                <InputField
+                  label="Numero capi"
+                  value={data.numeroCapi}
+                  onChange={(v) => updateField('numeroCapi', v)}
+                />
+                <InputField
+                  label="Offerta sede (€)"
+                  value={data.offertaSede}
+                  onChange={(v) => updateField('offertaSede', v)}
+                  step={0.1}
+                />
+                
+                <div className="mt-4 pt-4 border-t border-[#8b6f47]">
+                  <div className="mb-3">
+                    <span className="text-sm font-medium text-[#482878] block mb-2">
+                      Le quote dei capi sono spalmate nelle quote dei bambini?
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => updateField('quotaCapiDiCassa', false)}
+                        className={\`flex-1 py-2 px-4 rounded-lg font-medium transition-colors \${
+                          !data.quotaCapiDiCassa
+                            ? 'bg-[#482878] text-white'
+                            : 'bg-white border-2 border-[#8b6f47] text-[#8b6f47] hover:border-[#482878]'
+                        }\`}
+                      >
+                        Sì
+                      </button>
+                      <button
+                        onClick={() => updateField('quotaCapiDiCassa', true)}
+                        className={\`flex-1 py-2 px-4 rounded-lg font-medium transition-colors \${
+                          data.quotaCapiDiCassa
+                            ? 'bg-[#482878] text-white'
+                            : 'bg-white border-2 border-[#8b6f47] text-[#8b6f47] hover:border-[#482878]'
+                        }\`}
+                      >
+                        No
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {data.quotaCapiDiCassa && (
+                    <div className="mt-3">
+                      <InputField
+                        label="Importo per capo (€)"
+                        value={data.importoCapiDiCassa}
+                        onChange={(v) => updateField('importoCapiDiCassa', v)}
+                        step={0.1}
+                      />
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-[#8b6f47] mt-2">
+                    {data.quotaCapiDiCassa 
+                      ? "I capi contribuiscono di tasca propria o dalla cassa di branca" 
+                      : "La quota dei capi è spalmata nelle quote dei bambini"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white rounded-lg shadow-md border-2 border-[#8b6f47] p-6">
+            <h2 className="text-2xl font-normal text-[#482878] mb-4 border-b-2 border-[#482878] pb-2">
+              💰 Quote
+            </h2>
+            <div className="space-y-4">
+              <InputField
+                label="Quota solo giorno (€)"
+                value={data.quotaGiorno}
+                onChange={(v) => updateField('quotaGiorno', v)}
+                step={0.1}
+              />
+              <InputField
+                label="Quota pernotto (€)"
+                value={data.quotaPernotto}
+                onChange={(v) => updateField('quotaPernotto', v)}
+                step={0.1}
+              />
+              
+              <div className="mt-4 p-4 bg-[#f5f1e8] rounded border border-[#8b6f47]">
+                <div className="text-sm text-[#8b6f47] mb-2">
+                  Quota media di pareggio: <strong className="text-[#482878] text-lg">€ {quotaMedia.toFixed(2)}</strong>
+                </div>
+                <button
+                  onClick={impostaQuotePareggio}
+                  className="w-full mt-2 bg-[#482878] text-white py-2 px-4 rounded-lg font-normal hover:bg-[#5a3694] transition-colors"
+                >
+                  Calcola quote
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg border-4 border-[#482878] p-6 relative overflow-hidden">
+            <h2 className="text-2xl font-normal text-[#482878] mb-4 border-b-2 border-[#482878] pb-2">
+              📊 Risultati
+            </h2>
+            <div className="space-y-4">
+              <ResultRow
+                label="Uscite totali"
+                value={usciteTotali}
+                icon={<TrendingDown className="w-5 h-5 text-red-600" />}
+                color="text-red-600"
+              />
+              <ResultRow
+                label="Entrate totali"
+                value={entrateTotali}
+                icon={<TrendingUp className="w-5 h-5 text-[#482878]" />}
+                color="text-[#482878]"
+              />
+              <div className="border-t-2 border-[#8b6f47] pt-4">
+                <ResultRow
+                  label="Bilancio finale"
+                  value={bilancio}
+                  large
+                  color={bilancio >= 0 ? 'text-[#482878]' : 'text-red-600'}
+                />
+              </div>
+            </div>
+
+            <AnimatePresence>
+              {bilancio > 0 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -20, opacity: 0 }}
+                  animate={{ scale: 1, rotate: -12, opacity: 1 }}
+                  exit={{ scale: 0, rotate: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="absolute top-4 right-4"
+                >
+                  <div className="bg-[#482878] text-white font-bold text-xl px-6 py-3 rounded-lg border-4 border-[#482878] shadow-xl transform rotate-[-12deg]">
+                    IN ATTIVO
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InputField({
+  label,
+  value,
+  onChange,
+  step = 1,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  step?: number;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-[#482878] mb-1">
+        {label}
+      </label>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        step={step}
+        min="0"
+        className="w-full px-4 py-2 border-2 border-[#8b6f47] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#482878] focus:border-transparent bg-white"
+      />
+    </div>
+  );
+}
+
+function ResultRow({
+  label,
+  value,
+  icon,
+  color = 'text-gray-900',
+  large = false,
+}: {
+  label: string;
+  value: number;
+  icon?: React.ReactNode;
+  color?: string;
+  large?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className={\`font-medium \${large ? 'text-xl' : 'text-base'}\`}>
+          {label}
+        </span>
+      </div>
+      <span className={\`font-bold \${large ? 'text-2xl' : 'text-lg'} \${color}\`}>
+        € {value.toFixed(2)}
+      </span>
+    </div>
+  );
+}`,
+                    
+                    'src/styles/index.css': `@import './fonts.css';
+@import 'tailwindcss';
+@import './theme.css';`,
+                    
+                    'src/styles/fonts.css': `@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700;900&display=swap');`,
+                    
+                    'src/styles/theme.css': `@layer base {
+  :root {
+    --color-bg-primary: #f5f1e8;
+    --color-text-primary: #482878;
+    --color-text-secondary: #8b6f47;
+    --color-border: #8b6f47;
+  }
+}`,
+                    
+                    'src/styles/tailwind.css': `@import 'tailwindcss';`,
+                    
+                    '.github/workflows/deploy.yml': `name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build
+        run: pnpm run build
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: \${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4`,
+
+                    'tsconfig.json': `{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}`,
+
+                    'tsconfig.node.json': `{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}`,
+
+                    '.gitignore': `# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?`,
+
+                    'README.md': `# Ma quanto ci costa? 🎒
+
+Applicazione web per calcolare le quote delle uscite scout Agesci.
+
+## Caratteristiche
+
+- ✅ Calcolo automatico delle quote
+- ✅ Gestione partecipanti con pernotto
+- ✅ Trasporti per bambini e capi
+- ✅ Quote capi personalizzabili
+- ✅ Interfaccia scout-style con colori viola Agesci
+
+## Come usare
+
+Visita: https://simmete1.github.io/quotauscita/
+
+## Sviluppo locale
+
+\`\`\`bash
+# Installa dipendenze
+pnpm install
+
+# Avvia server di sviluppo
+pnpm dev
+
+# Build per produzione
+pnpm build
+\`\`\`
+
+## Tecnologie
+
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- Motion (Framer Motion)
+- Lucide React Icons
+
+---
+
+Fatto con ❤️ per gli scout Agesci`
+                };
+                
+                // Aggiungi tutti i file al ZIP
+                for (const [path, content] of Object.entries(files)) {
+                    zip.file(path, content);
+                }
+                
+                // Genera il blob e scarica
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'quotauscita.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Mostra successo
+                successMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Download completato!';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg> Scarica ZIP';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Errore durante la creazione del ZIP:', error);
+                btn.disabled = false;
+                btn.innerHTML = '❌ Errore! Riprova';
+                setTimeout(() => {
+                    btn.innerHTML = '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg> Scarica ZIP';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
